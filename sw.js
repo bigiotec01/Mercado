@@ -1,4 +1,4 @@
-const CACHE_NAME = 'super-v1.2.0';
+const CACHE_NAME = 'super-v1.3.0';
 const SHELL = [
   './',
   './index.html',
