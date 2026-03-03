@@ -1,0 +1,20 @@
+{
+  "name": "Mi Súper App",
+  "short_name": "Súper",
+  "description": "Lista de compras inteligente con escaneo de códigos de barras",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#00897b",
+  "theme_color": "#00897b",
+  "lang": "es",
+  "categories": ["shopping", "utilities"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

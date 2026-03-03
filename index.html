@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#00897b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Súper">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>Mi Súper App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/quagga/dist/quagga.min.js"></script>
+  <style>
+    /* ── Reset & Variables ───────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:       #00897b;
+      --primary-dark:  #00695c;
+      --primary-light: #e0f2f1;
+      --danger:        #e53935;
+      --success:       #43a047;
+      --text:          #212121;
+      --text-muted:    #757575;
+      --bg:            #f0f4f3;
+      --card:          #ffffff;
+      --shadow:        0 2px 12px rgba(0,0,0,0.08);
+      --radius:        14px;
+      --font:          'Poppins', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 84px;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 20px 18px 18px;
+      text-align: center;
+    }
+    header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+
+    .progress-wrap {
+      margin: 12px 0 6px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 99px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: white;
+      border-radius: 99px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+    .progress-text { font-size: 13px; opacity: 0.9; font-weight: 600; }
+
+    /* ── Add item card ───────────────────────────────── */
+    .add-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 14px 10px;
+      margin: 14px 14px 0;
+    }
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .input-row input {
+      flex: 1;
+      padding: 12px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+      color: var(--text);
+      background: #fafafa;
+    }
+    .input-row input:focus { border-color: var(--primary); background: white; }
+    .btn-add {
+      width: 48px; height: 48px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 26px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.12s, background 0.15s;
+    }
+    .btn-add:active { transform: scale(0.91); background: var(--primary-dark); }
+
+    /* ── Category chips ──────────────────────────────── */
+    .cat-chips {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 2px 0 4px;
+      scrollbar-width: none;
+    }
+    .cat-chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0;
+      padding: 5px 13px;
+      border-radius: 99px;
+      border: 2px solid transparent;
+      background: #f0f0f0;
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .chip.selected {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .chip:active { transform: scale(0.94); }
+
+    /* ── List ────────────────────────────────────────── */
+    main { padding: 14px 14px 0; }
+
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-muted);
+    }
+    .empty-icon { font-size: 52px; margin-bottom: 14px; }
+    .empty-state p { font-size: 15px; line-height: 1.6; }
+
+    /* Category section */
+    .cat-section { margin-bottom: 10px; }
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 4px 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .cat-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .cat-count {
+      margin-left: auto;
+      font-size: 11px;
+      background: #eeeeee;
+      border-radius: 99px;
+      padding: 2px 9px;
+      color: var(--text-muted);
+      font-weight: 700;
+      transition: background 0.3s, color 0.3s;
+    }
+    .cat-count.done { background: var(--primary); color: white; }
+
+    /* Item row */
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 13px 13px;
+      background: var(--card);
+      border-radius: 12px;
+      margin-bottom: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: opacity 0.3s ease, transform 0.15s;
+      animation: slideIn 0.2s ease both;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .item-row:active { transform: scale(0.985); }
+    .item-row.comprado { opacity: 0.48; }
+
+    .item-emoji { font-size: 19px; flex-shrink: 0; line-height: 1; }
+    .item-nombre {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.3;
+      transition: color 0.2s;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .item-row.comprado .item-nombre {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+    .item-check {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 2.5px solid #ddd;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 13px;
+      color: white;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .item-row.comprado .item-check {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    .btn-delete {
+      width: 30px; height: 30px;
+      border: none;
+      background: none;
+      color: #ccc;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      padding: 0;
+      transition: color 0.15s, background 0.15s;
+    }
+    .btn-delete:active { color: var(--danger); background: #fce4e4; }
+
+    /* ── Bottom toolbar ──────────────────────────────── */
+    .toolbar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      gap: 10px;
+      padding: 10px 14px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      background: var(--card);
+      box-shadow: 0 -2px 16px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    .btn-scan-tool {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 16px;
+      height: 52px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.12s, background 0.15s;
+    }
+    .btn-scan-tool:active { transform: scale(0.94); background: #b2dfdb; }
+    .btn-finalizar {
+      flex: 1;
+      height: 52px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.12s, background 0.15s;
+    }
+    .btn-finalizar:active { transform: scale(0.97); background: var(--primary-dark); }
+    .btn-finalizar:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+    .badge {
+      background: white;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 99px;
+      padding: 2px 9px;
+    }
+
+    /* ── Camera overlay ──────────────────────────────── */
+    #cameraOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.97);
+      z-index: 300;
+      flex-direction: column;
+      align-items: center;
+    }
+    #cameraOverlay.active { display: flex; }
+    .camera-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 18px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .btn-close-cam {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .camera-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+    }
+    #interactive {
+      width: 100%;
+      height: 62vw;
+      max-height: 370px;
+      overflow: hidden;
+    }
+    #interactive video  { width: 100% !important; height: 100% !important; object-fit: cover; }
+    #interactive canvas { display: none !important; }
+    .scan-line {
+      position: absolute;
+      left: 5%; width: 90%;
+      height: 2px;
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary), 0 0 22px var(--primary);
+      animation: scanMove 2.5s ease-in-out infinite;
+      pointer-events: none;
+      top: 50%;
+    }
+    .camera-hint { color: #999; font-size: 13px; margin-top: 18px; text-align: center; padding: 0 20px; }
+
+    /* ── Modals (bottom sheets) ───────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 400;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      padding: 24px 18px;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      animation: slideUp 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .modal-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .modal-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 16px; }
+    .modal-code {
+      color: var(--text-muted);
+      font-size: 12px;
+      font-family: monospace;
+      margin-bottom: 14px;
+      background: #f5f5f5;
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .modal-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 14px 0 8px;
+    }
+    .modal-card input[type=text] {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      color: var(--text);
+    }
+    .modal-card input[type=text]:focus { border-color: var(--primary); }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-actions button {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.12s;
+    }
+    .modal-actions button:active { transform: scale(0.96); }
+    .btn-secondary { background: #f0f0f0; color: var(--text); }
+    .btn-primary   { background: var(--primary); color: white; }
+    .btn-success   { background: var(--success); color: white; }
+
+    /* Faltantes in summary modal */
+    .faltante-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 12px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .faltante-row span { flex: 1; font-weight: 600; font-size: 15px; }
+    .btn-del-faltante {
+      background: #fce4e4;
+      color: var(--danger);
+      border: none;
+      border-radius: 8px;
+      padding: 6px 13px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ── Toast ───────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30,30,30,0.88);
+      color: white;
+      padding: 10px 22px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 500;
+      white-space: nowrap;
+      pointer-events: none;
+      animation: fadeInOut 2.6s forwards;
+    }
+
+    /* ── Animations ──────────────────────────────────── */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(32px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    @keyframes scanMove {
+      0%   { top: 18%; }
+      50%  { top: 82%; }
+      100% { top: 18%; }
+    }
+    @keyframes fadeInOut {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      14%  { opacity: 1; transform: translateX(-50%) translateY(0);    }
+      75%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────── -->
+<header>
+  <h1>🛒 Mi Súper App</h1>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <p class="progress-text" id="progressText">Lista vacía</p>
+</header>
+
+<!-- ── Add item ───────────────────────────────────── -->
+<div class="add-card">
+  <div class="input-row">
+    <input type="text" id="manualInput" placeholder="Agregar producto..." autocomplete="off" autocorrect="off" autocapitalize="sentences">
+    <button class="btn-add" onclick="agregarManual()" aria-label="Agregar">+</button>
+  </div>
+  <div class="cat-chips" id="catChips"></div>
+</div>
+
+<!-- ── List ──────────────────────────────────────── -->
+<main id="listaContenedor"></main>
+
+<!-- ── Toolbar ───────────────────────────────────── -->
+<div class="toolbar">
+  <button class="btn-scan-tool" onclick="activarEscaneo()">
+    <span style="font-size:20px;line-height:1">📷</span>
+    Escanear
+  </button>
+  <button class="btn-finalizar" id="btnFinalizar" onclick="abrirResumenFinal()" disabled>
+    Finalizar
+    <span class="badge" id="pendienteBadge" style="display:none"></span>
+  </button>
+</div>
+
+<!-- ── Camera overlay ────────────────────────────── -->
+<div id="cameraOverlay">
+  <div class="camera-header">
+    <span>Apunta al código de barras</span>
+    <button class="btn-close-cam" onclick="cerrarCamara()">✕</button>
+  </div>
+  <div class="camera-wrap">
+    <div id="interactive"></div>
+    <div class="scan-line"></div>
+  </div>
+  <p class="camera-hint">Mantén la cámara estable sobre el código</p>
+</div>
+
+<!-- ── Modal: nuevo producto ──────────────────────── -->
+<div id="modalNuevoProducto" class="modal-overlay">
+  <div class="modal-card">
+    <h3>Producto nuevo</h3>
+    <p class="modal-code" id="codigoLabel"></p>
+    <p class="modal-subtitle" id="modalNuevoSubtitle" style="display:none"></p>
+    <input type="text" id="nombreNuevo" placeholder="¿Qué es este producto?">
+    <p class="modal-label">Categoría</p>
+    <div class="cat-chips" id="catChipsModal"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="cancelarNuevoProducto()">Cancelar</button>
+      <button class="btn-primary"   onclick="confirmarNuevoProducto()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: resumen final ───────────────────────── -->
+<div id="modalResumen" class="modal-overlay">
+  <div class="modal-card">
+    <h3>Pendientes</h3>
+    <p class="modal-subtitle">¿Qué borramos de la lista para la próxima?</p>
+    <div id="contenedorFaltantes"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="cerrarResumen()">Volver</button>
+      <button class="btn-success"   onclick="confirmarYLimpiar()">Guardar y salir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+const CATEGORIAS = [
+  { nombre: 'Frutas y Verduras',  emoji: '🥦', color: '#43a047' },
+  { nombre: 'Lácteos y Huevos',   emoji: '🥛', color: '#039be5' },
+  { nombre: 'Carnes y Pescado',   emoji: '🥩', color: '#e53935' },
+  { nombre: 'Bebidas',            emoji: '🥤', color: '#8e24aa' },
+  { nombre: 'Limpieza',           emoji: '🧹', color: '#00acc1' },
+  { nombre: 'Higiene y Cuidado',  emoji: '🧴', color: '#fb8c00' },
+  { nombre: 'Panadería y Pastas', emoji: '🍞', color: '#f9a825' },
+  { nombre: 'Congelados',         emoji: '🧊', color: '#26c6da' },
+  { nombre: 'Otros',              emoji: '📦', color: '#757575' },
+];
+
+const CAT_MAP = Object.fromEntries(CATEGORIAS.map(c => [c.nombre, c]));
+
+// ── State ─────────────────────────────────────────────────────────────────────
+
+let lista = JSON.parse(localStorage.getItem('lista_super')) || [];
+let productosConocidos = JSON.parse(localStorage.getItem('diccionario_super')) || {};
+
+// Backward compatibility: migrate old string values
+lista = lista.map(p => ({
+  nombre:   p.nombre,
+  comprado: p.comprado || false,
+  categoria: p.categoria || 'Otros',
+}));
+Object.keys(productosConocidos).forEach(k => {
+  if (typeof productosConocidos[k] === 'string') {
+    productosConocidos[k] = { nombre: productosConocidos[k], categoria: 'Otros' };
+  }
+});
+
+let catActual       = 'Otros';
+let catNuevo        = 'Otros';
+let codigoPendiente = null;
+let quaggaRunning   = false;
+
+// ── Chips ─────────────────────────────────────────────────────────────────────
+
+function renderChips(containerId, selected, onSelect) {
+  const cont = document.getElementById(containerId);
+  if (!cont) return;
+  cont.innerHTML = '';
+  CATEGORIAS.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'chip' + (cat.nombre === selected ? ' selected' : '');
+    btn.textContent = cat.emoji + ' ' + cat.nombre.split(' y ')[0].split(' ')[0];
+    btn.onclick = () => onSelect(cat.nombre);
+    cont.appendChild(btn);
+  });
+}
+
+function initCatChips() {
+  renderChips('catChips', catActual, selectCatManual);
+}
+function selectCatManual(c) {
+  catActual = c;
+  initCatChips();
+}
+
+function initModalCatChips() {
+  renderChips('catChipsModal', catNuevo, selectCatNuevo);
+}
+function selectCatNuevo(c) {
+  catNuevo = c;
+  initModalCatChips();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function render() {
+  const cont     = document.getElementById('listaContenedor');
+  const total    = lista.length;
+  const comprados = lista.filter(p => p.comprado).length;
+  const pendientes = total - comprados;
+
+  // Progress
+  const pct = total === 0 ? 0 : Math.round((comprados / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent =
+    total === 0
+      ? 'Lista vacía'
+      : comprados === total
+        ? '¡Todo comprado! 🎉'
+        : `${comprados} de ${total} productos comprados`;
+
+  // Toolbar button
+  const btn   = document.getElementById('btnFinalizar');
+  const badge = document.getElementById('pendienteBadge');
+  btn.disabled = total === 0;
+  if (pendientes > 0) {
+    badge.style.display = 'inline';
+    badge.textContent   = pendientes + ' pend.';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  // Save
+  localStorage.setItem('lista_super', JSON.stringify(lista));
+
+  // Empty state
+  if (total === 0) {
+    cont.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🛒</div>
+        <p>Tu lista está vacía.<br>Agrega productos arriba o escanea un código.</p>
+      </div>`;
+    return;
+  }
+
+  // Grouped by category
+  cont.innerHTML = '';
+  CATEGORIAS.forEach(cat => {
+    const items = lista
+      .map((p, i) => ({ ...p, idx: i }))
+      .filter(p => p.categoria === cat.nombre);
+    if (items.length === 0) return;
+
+    const section  = document.createElement('div');
+    section.className = 'cat-section';
+    const doneCount = items.filter(p => p.comprado).length;
+    const allDone   = doneCount === items.length;
+
+    const header = document.createElement('div');
+    header.className = 'cat-header';
+    header.innerHTML = `
+      <span class="cat-dot" style="background:${cat.color}"></span>
+      <span>${cat.emoji} ${cat.nombre}</span>
+      <span class="cat-count ${allDone ? 'done' : ''}">${doneCount}/${items.length}</span>`;
+    section.appendChild(header);
+
+    items.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'item-row' + (p.comprado ? ' comprado' : '');
+      div.onclick = () => toggleComprado(p.idx);
+      div.innerHTML = `
+        <span class="item-emoji">${cat.emoji}</span>
+        <span class="item-nombre">${escapeHtml(p.nombre)}</span>
+        <span class="item-check">${p.comprado ? '✓' : ''}</span>
+        <button class="btn-delete" onclick="borrarItem(${p.idx},event)" aria-label="Borrar">✕</button>`;
+      section.appendChild(div);
+    });
+
+    cont.appendChild(section);
+  });
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+
+function toggleComprado(index) {
+  lista[index].comprado = !lista[index].comprado;
+  if (navigator.vibrate) navigator.vibrate(45);
+  render();
+}
+
+function borrarItem(index, event) {
+  event.stopPropagation();
+  lista.splice(index, 1);
+  render();
+}
+
+function agregarManual() {
+  const input  = document.getElementById('manualInput');
+  const nombre = input.value.trim();
+  if (!nombre) { input.focus(); return; }
+  lista.push({ nombre, comprado: false, categoria: catActual });
+  input.value = '';
+  render();
+  input.focus();
+}
+
+document.getElementById('manualInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') agregarManual();
+});
+
+// ── Scanner ───────────────────────────────────────────────────────────────────
+
+function activarEscaneo() {
+  document.getElementById('cameraOverlay').classList.add('active');
+  quaggaRunning = true;
+  Quagga.init({
+    inputStream: {
+      name: 'Live',
+      type: 'LiveStream',
+      target: document.getElementById('interactive'),
+      constraints: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+    },
+    decoder: { readers: ['ean_reader', 'upc_reader', 'ean_8_reader', 'code_128_reader'] },
+    locate: true,
+  }, err => {
+    if (err) {
+      cerrarCamara();
+      mostrarToast('No se pudo acceder a la cámara');
+      return;
+    }
+    Quagga.start();
+  });
+  Quagga.offDetected(handleDetected);
+  Quagga.onDetected(handleDetected);
+}
+
+function cerrarCamara() {
+  if (quaggaRunning) {
+    try { Quagga.stop(); } catch (_) {}
+    quaggaRunning = false;
+  }
+  document.getElementById('cameraOverlay').classList.remove('active');
+}
+
+async function handleDetected(data) {
+  if (!quaggaRunning) return;
+  const codigo = data.codeResult.code;
+  cerrarCamara();
+  if (navigator.vibrate) navigator.vibrate(60);
+
+  const conocido = productosConocidos[codigo];
+  if (conocido) {
+    const existente = lista.find(p => p.nombre === conocido.nombre);
+    if (existente) {
+      existente.comprado = true;
+      mostrarToast('✅ ' + conocido.nombre + ' marcado como comprado');
+    } else {
+      lista.push({ nombre: conocido.nombre, comprado: false, categoria: conocido.categoria || 'Otros' });
+      mostrarToast('➕ ' + conocido.nombre + ' añadido');
+    }
+    render();
+  } else {
+    mostrarToast('🔍 Buscando producto...');
+    let nombreSugerido = '';
+    try {
+      const res  = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo}.json`);
+      const json = await res.json();
+      if (json.status === 1 && json.product) {
+        nombreSugerido = json.product.product_name_es || json.product.product_name || '';
+      }
+    } catch (_) {}
+    abrirModalNuevoProducto(codigo, nombreSugerido);
+  }
+}
+
+// ── Modal nuevo producto ──────────────────────────────────────────────────────
+
+function abrirModalNuevoProducto(codigo, nombreSugerido = '') {
+  codigoPendiente = codigo;
+  catNuevo = catActual;
+  document.getElementById('codigoLabel').textContent = 'Código: ' + codigo;
+  document.getElementById('nombreNuevo').value = nombreSugerido;
+  const subtitle = document.getElementById('modalNuevoSubtitle');
+  if (nombreSugerido) {
+    subtitle.textContent = '✨ Nombre encontrado automáticamente — podés editarlo';
+    subtitle.style.display = '';
+  } else {
+    subtitle.style.display = 'none';
+  }
+  initModalCatChips();
+  document.getElementById('modalNuevoProducto').classList.add('active');
+  setTimeout(() => {
+    const input = document.getElementById('nombreNuevo');
+    input.focus();
+    if (nombreSugerido) input.select();
+  }, 320);
+}
+
+function confirmarNuevoProducto() {
+  const nombre = document.getElementById('nombreNuevo').value.trim();
+  if (!nombre) { document.getElementById('nombreNuevo').focus(); return; }
+  productosConocidos[codigoPendiente] = { nombre, categoria: catNuevo };
+  localStorage.setItem('diccionario_super', JSON.stringify(productosConocidos));
+  lista.push({ nombre, comprado: false, categoria: catNuevo });
+  cancelarNuevoProducto();
+  render();
+  mostrarToast('➕ ' + nombre + ' añadido');
+}
+
+function cancelarNuevoProducto() {
+  document.getElementById('modalNuevoProducto').classList.remove('active');
+  codigoPendiente = null;
+}
+
+// ── Finalizar ─────────────────────────────────────────────────────────────────
+
+function abrirResumenFinal() {
+  const faltantes = lista.filter(p => !p.comprado);
+  if (faltantes.length === 0) {
+    if (confirm('¡Compraste todo! ¿Vaciar la lista?')) {
+      lista = [];
+      render();
+    }
+    return;
+  }
+
+  const cont = document.getElementById('contenedorFaltantes');
+  cont.innerHTML = '';
+  faltantes.forEach(p => {
+    const idx = lista.indexOf(p);
+    const cat = CAT_MAP[p.categoria] || CAT_MAP['Otros'];
+    const row = document.createElement('div');
+    row.className = 'faltante-row';
+    row.innerHTML = `
+      <span>${cat.emoji} ${escapeHtml(p.nombre)}</span>
+      <button class="btn-del-faltante" onclick="borrarFaltante(${idx})">Borrar</button>`;
+    cont.appendChild(row);
+  });
+  document.getElementById('modalResumen').classList.add('active');
+}
+
+function borrarFaltante(index) {
+  lista.splice(index, 1);
+  render();
+  const restantes = lista.filter(p => !p.comprado);
+  if (restantes.length === 0) {
+    cerrarResumen();
+    mostrarToast('¡Sin pendientes! 🎉');
+  } else {
+    abrirResumenFinal();
+  }
+}
+
+function cerrarResumen() {
+  document.getElementById('modalResumen').classList.remove('active');
+}
+
+function confirmarYLimpiar() {
+  lista = lista.filter(p => !p.comprado);
+  cerrarResumen();
+  render();
+  mostrarToast('Lista guardada para la próxima 🎉');
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+
+function mostrarToast(msg) {
+  const old = document.getElementById('toast');
+  if (old) old.remove();
+  const t = document.createElement('div');
+  t.id = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { if (t.parentNode) t.remove(); }, 2700);
+}
+
+// ── Backdrop close ────────────────────────────────────────────────────────────
+
+document.getElementById('modalNuevoProducto').addEventListener('click', function(e) {
+  if (e.target === this) cancelarNuevoProducto();
+});
+document.getElementById('modalResumen').addEventListener('click', function(e) {
+  if (e.target === this) cerrarResumen();
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('cameraOverlay').classList.contains('active'))       cerrarCamara();
+  if (document.getElementById('modalNuevoProducto').classList.contains('active'))  cancelarNuevoProducto();
+  if (document.getElementById('modalResumen').classList.contains('active'))        cerrarResumen();
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+initCatChips();
+render();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
