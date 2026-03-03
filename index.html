@@ -812,7 +812,14 @@ async function handleDetected(data) {
       const res  = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo}.json`);
       const json = await res.json();
       if (json.status === 1 && json.product) {
-        nombreSugerido = json.product.product_name_es || json.product.product_name || '';
+        const p = json.product;
+        nombreSugerido = (
+          p.product_name_es || p.product_name_en || p.product_name ||
+          p.abbreviated_product_name || p.generic_name || ''
+        ).trim();
+        if (!nombreSugerido && p.brands) {
+          nombreSugerido = p.brands.split(',')[0].trim();
+        }
       }
     } catch (_) {}
     abrirModalNuevoProducto(codigo, nombreSugerido);
