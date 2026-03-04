@@ -813,31 +813,52 @@ async function handleDetected(data) {
   } else {
     mostrarToast('🔍 Buscando producto...');
     let nombreSugerido = '';
+
+    // Helper: extraer nombre de un producto de Open Food Facts
+    function extraerNombreOFF(p) {
+      const nombre = (
+        p.product_name_en || p.product_name_es || p.product_name ||
+        p.abbreviated_product_name || p.generic_name || ''
+      ).trim();
+      if (nombre) return nombre;
+      if (p.brands) return p.brands.split(',')[0].trim();
+      return '';
+    }
+
     try {
-      // 1️⃣ Open Food Facts
-      const r1   = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo}.json`);
-      const j1   = await r1.json();
+      // 1️⃣ Open Food Facts US (mejor cobertura para Puerto Rico)
+      const r1 = await fetch(`https://us.openfoodfacts.org/api/v0/product/${codigo}.json`);
+      const j1 = await r1.json();
       if (j1.status === 1 && j1.product) {
-        const p = j1.product;
-        nombreSugerido = (
-          p.product_name_es || p.product_name_en || p.product_name ||
-          p.abbreviated_product_name || p.generic_name || ''
-        ).trim();
-        if (!nombreSugerido && p.brands) {
-          nombreSugerido = p.brands.split(',')[0].trim();
-        }
+        nombreSugerido = extraerNombreOFF(j1.product);
       }
     } catch (_) {}
+
     if (!nombreSugerido) {
       try {
-        // 2️⃣ UPC Item DB (fallback)
-        const r2 = await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${codigo}`);
+        // 2️⃣ Open Food Facts global
+        const r2 = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo}.json`);
         const j2 = await r2.json();
-        if (j2.code === 'OK' && j2.items && j2.items.length > 0) {
-          const item = j2.items[0];
+        if (j2.status === 1 && j2.product) {
+          nombreSugerido = extraerNombreOFF(j2.product);
+        }
+      } catch (_) {}
+    }
+
+    if (!nombreSugerido) {
+      try {
+        // 3️⃣ UPC Item DB (fallback, limitado a 100/día)
+        const r3 = await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${codigo}`);
+        const j3 = await r3.json();
+        if (j3.code === 'OK' && j3.items && j3.items.length > 0) {
+          const item = j3.items[0];
           nombreSugerido = (item.title || item.brand || '').trim();
         }
       } catch (_) {}
+    }
+
+    if (!nombreSugerido) {
+      mostrarToast('⚠️ Producto no encontrado en ninguna base de datos');
     }
     abrirModalNuevoProducto(codigo, nombreSugerido);
   }
