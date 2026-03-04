@@ -23,12 +23,12 @@
       --primary-light: #e0f2f1;
       --danger:        #e53935;
       --success:       #43a047;
-      --text:          #212121;
+      --text:          #1a1a2e;
       --text-muted:    #757575;
-      --bg:            #f0f4f3;
+      --bg:            #f3f6f5;
       --card:          #ffffff;
-      --shadow:        0 2px 12px rgba(0,0,0,0.08);
-      --radius:        14px;
+      --shadow:        0 2px 12px rgba(0,0,0,0.07);
+      --radius:        16px;
       --font:          'Poppins', sans-serif;
     }
 
@@ -37,71 +37,141 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding-bottom: 84px;
+      padding-bottom: 90px;
     }
 
     /* ── Header ─────────────────────────────────────── */
     header {
-      background: var(--primary);
+      background: linear-gradient(145deg, #00897b 0%, #00695c 100%);
       color: white;
-      padding: 20px 18px 18px;
-      text-align: center;
+      padding: 22px 18px 18px;
     }
-    header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
-
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .version-badge {
+      font-size: 10px;
+      font-weight: 600;
+      opacity: 0.65;
+      background: rgba(255,255,255,0.18);
+      padding: 3px 9px;
+      border-radius: 99px;
+      letter-spacing: 0.3px;
+    }
+    .header-sub {
+      font-size: 13px;
+      opacity: 0.85;
+      font-weight: 400;
+      margin-bottom: 14px;
+    }
     .progress-wrap {
-      margin: 12px 0 6px;
       background: rgba(255,255,255,0.25);
       border-radius: 99px;
-      height: 8px;
+      height: 7px;
       overflow: hidden;
     }
     .progress-fill {
       height: 100%;
       background: white;
       border-radius: 99px;
-      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
       width: 0%;
     }
-    .progress-text { font-size: 13px; opacity: 0.9; font-weight: 600; }
+    .progress-text {
+      font-size: 11px;
+      opacity: 0.7;
+      font-weight: 600;
+      margin-top: 7px;
+      text-align: right;
+    }
+
+    /* ── Frecuentes ───────────────────────────────── */
+    .frecuentes-section {
+      padding: 16px 14px 0;
+    }
+    .frecuentes-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 9px;
+    }
+    .frecuentes-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 0 4px;
+      scrollbar-width: none;
+    }
+    .frecuentes-chips::-webkit-scrollbar { display: none; }
+    .frec-chip {
+      flex-shrink: 0;
+      padding: 7px 15px;
+      border-radius: 99px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid rgba(0,137,123,0.18);
+      white-space: nowrap;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .frec-chip:active { transform: scale(0.93); background: #b2dfdb; }
 
     /* ── Add item card ───────────────────────────────── */
     .add-card {
       background: var(--card);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 14px 14px 10px;
+      padding: 14px 14px 12px;
       margin: 14px 14px 0;
     }
     .input-row {
       display: flex;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 11px;
     }
     .input-row input {
       flex: 1;
       padding: 12px 14px;
-      border: 2px solid #e0e0e0;
-      border-radius: 10px;
+      border: 2px solid #e8e8e8;
+      border-radius: 12px;
       font-family: var(--font);
       font-size: 15px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
       color: var(--text);
-      background: #fafafa;
+      background: #f8f8f8;
     }
-    .input-row input:focus { border-color: var(--primary); background: white; }
+    .input-row input:focus {
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+    }
     .btn-add {
       width: 48px; height: 48px;
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 26px;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       transition: transform 0.12s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn-add:active { transform: scale(0.91); background: var(--primary-dark); }
 
@@ -127,6 +197,7 @@
       cursor: pointer;
       transition: all 0.15s;
       white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
     }
     .chip.selected {
       background: var(--primary-light);
@@ -140,19 +211,20 @@
 
     .empty-state {
       text-align: center;
-      padding: 50px 20px;
+      padding: 52px 20px 40px;
       color: var(--text-muted);
     }
-    .empty-icon { font-size: 52px; margin-bottom: 14px; }
-    .empty-state p { font-size: 15px; line-height: 1.6; }
+    .empty-icon { font-size: 56px; margin-bottom: 16px; }
+    .empty-state p { font-size: 15px; line-height: 1.7; }
+    .empty-state strong { color: var(--text); }
 
     /* Category section */
-    .cat-section { margin-bottom: 10px; }
+    .cat-section { margin-bottom: 12px; }
     .cat-header {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 4px 6px;
+      padding: 5px 4px 7px;
       font-size: 12px;
       font-weight: 700;
       color: var(--text-muted);
@@ -160,14 +232,14 @@
       letter-spacing: 0.6px;
     }
     .cat-dot {
-      width: 9px; height: 9px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
     }
     .cat-count {
       margin-left: auto;
       font-size: 11px;
-      background: #eeeeee;
+      background: #ebebeb;
       border-radius: 99px;
       padding: 2px 9px;
       color: var(--text-muted);
@@ -180,22 +252,22 @@
     .item-row {
       display: flex;
       align-items: center;
-      gap: 11px;
-      padding: 13px 13px;
+      gap: 10px;
+      padding: 12px 13px;
       background: var(--card);
-      border-radius: 12px;
-      margin-bottom: 6px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-radius: 14px;
+      margin-bottom: 7px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.055);
       cursor: pointer;
-      transition: opacity 0.3s ease, transform 0.15s;
-      animation: slideIn 0.2s ease both;
+      transition: opacity 0.3s ease, transform 0.12s;
+      animation: slideIn 0.22s ease both;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
-    .item-row:active { transform: scale(0.985); }
-    .item-row.comprado { opacity: 0.48; }
+    .item-row:active { transform: scale(0.984); }
+    .item-row.comprado { opacity: 0.42; }
 
-    .item-emoji { font-size: 19px; flex-shrink: 0; line-height: 1; }
+    .item-emoji { font-size: 18px; flex-shrink: 0; line-height: 1; }
     .item-nombre {
       flex: 1;
       font-size: 15px;
@@ -210,13 +282,54 @@
       text-decoration: line-through;
       color: var(--text-muted);
     }
+
+    /* Quantity stepper */
+    .qty-stepper {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .qty-btn {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+      transition: background 0.15s, transform 0.1s;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .qty-btn:active { background: #b2dfdb; transform: scale(0.88); }
+    .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none !important; }
+    .qty-num {
+      font-size: 14px;
+      font-weight: 700;
+      min-width: 18px;
+      text-align: center;
+      color: var(--text);
+    }
+    .qty-done {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      min-width: 28px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
     .item-check {
       width: 26px; height: 26px;
       border-radius: 50%;
-      border: 2.5px solid #ddd;
+      border: 2.5px solid #d8d8d8;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      font-size: 13px;
+      font-size: 12px;
       color: white;
       transition: background 0.2s, border-color 0.2s;
     }
@@ -229,13 +342,14 @@
       border: none;
       background: none;
       color: #ccc;
-      font-size: 15px;
+      font-size: 14px;
       cursor: pointer;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       padding: 0;
       transition: color 0.15s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn-delete:active { color: var(--danger); background: #fce4e4; }
 
@@ -244,11 +358,11 @@
       position: fixed;
       bottom: 0; left: 0; right: 0;
       display: flex;
-      gap: 10px;
+      gap: 9px;
       padding: 10px 14px;
       padding-bottom: max(10px, env(safe-area-inset-bottom));
       background: var(--card);
-      box-shadow: 0 -2px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 -2px 18px rgba(0,0,0,0.09);
       z-index: 100;
     }
     .btn-scan-tool {
@@ -256,27 +370,43 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 0 16px;
+      padding: 0 14px;
       height: 52px;
       background: var(--primary-light);
       color: var(--primary);
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       font-family: var(--font);
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       flex-shrink: 0;
       transition: transform 0.12s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn-scan-tool:active { transform: scale(0.94); background: #b2dfdb; }
+    .btn-whatsapp {
+      width: 52px; height: 52px;
+      background: #25d366;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.12s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-whatsapp:active { transform: scale(0.93); background: #1ebe5d; }
+    .btn-whatsapp:disabled { background: #ccc; cursor: not-allowed; transform: none; }
     .btn-finalizar {
       flex: 1;
       height: 52px;
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       font-family: var(--font);
       font-size: 15px;
       font-weight: 700;
@@ -286,16 +416,17 @@
       justify-content: center;
       gap: 8px;
       transition: transform 0.12s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn-finalizar:active { transform: scale(0.97); background: var(--primary-dark); }
     .btn-finalizar:disabled { background: #ccc; cursor: not-allowed; transform: none; }
     .badge {
       background: white;
       color: var(--primary);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       border-radius: 99px;
-      padding: 2px 9px;
+      padding: 2px 8px;
     }
 
     /* ── Camera overlay ──────────────────────────────── */
@@ -359,7 +490,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.55);
+      background: rgba(0,0,0,0.52);
       z-index: 400;
       align-items: flex-end;
       justify-content: center;
@@ -367,7 +498,7 @@
     .modal-overlay.active { display: flex; }
     .modal-card {
       background: var(--card);
-      border-radius: 20px 20px 0 0;
+      border-radius: 22px 22px 0 0;
       padding: 24px 18px;
       padding-bottom: max(24px, env(safe-area-inset-bottom));
       width: 100%;
@@ -376,7 +507,7 @@
       animation: slideUp 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .modal-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-    .modal-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 16px; }
+    .modal-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; line-height: 1.5; }
     .modal-code {
       color: var(--text-muted);
       font-size: 12px;
@@ -384,8 +515,8 @@
       margin-bottom: 14px;
       background: #f5f5f5;
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
+      padding: 3px 9px;
+      border-radius: 7px;
     }
     .modal-label {
       font-size: 12px;
@@ -398,15 +529,18 @@
     .modal-card input[type=text] {
       width: 100%;
       padding: 14px;
-      border: 2px solid #e0e0e0;
-      border-radius: 10px;
+      border: 2px solid #e8e8e8;
+      border-radius: 12px;
       font-family: var(--font);
       font-size: 16px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
       color: var(--text);
     }
-    .modal-card input[type=text]:focus { border-color: var(--primary); }
+    .modal-card input[type=text]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+    }
     .modal-actions {
       display: flex;
       gap: 10px;
@@ -415,7 +549,7 @@
     .modal-actions button {
       flex: 1;
       padding: 14px;
-      border-radius: 12px;
+      border-radius: 13px;
       font-family: var(--font);
       font-size: 15px;
       font-weight: 600;
@@ -434,16 +568,17 @@
       align-items: center;
       gap: 12px;
       padding: 13px 12px;
-      background: #f9f9f9;
-      border-radius: 10px;
+      background: #f8f8f8;
+      border-radius: 12px;
       margin-bottom: 8px;
     }
     .faltante-row span { flex: 1; font-weight: 600; font-size: 15px; }
+    .faltante-row .qty-label { font-size: 13px; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
     .btn-del-faltante {
       background: #fce4e4;
       color: var(--danger);
       border: none;
-      border-radius: 8px;
+      border-radius: 9px;
       padding: 6px 13px;
       font-family: var(--font);
       font-size: 13px;
@@ -455,10 +590,10 @@
     /* ── Toast ───────────────────────────────────────── */
     #toast {
       position: fixed;
-      bottom: 82px;
+      bottom: 88px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(30,30,30,0.88);
+      background: rgba(20,20,20,0.88);
       color: white;
       padding: 10px 22px;
       border-radius: 99px;
@@ -472,7 +607,7 @@
 
     /* ── Animations ──────────────────────────────────── */
     @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-10px); }
+      from { opacity: 0; transform: translateY(-8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     @keyframes slideUp {
@@ -496,17 +631,27 @@
 
 <!-- ── Header ─────────────────────────────────────── -->
 <header>
-  <h1>🛒 Mi Súper App <span id="versionBadge" style="font-size:11px;font-weight:400;opacity:0.7;vertical-align:middle"></span></h1>
+  <div class="header-top">
+    <h1>🛒 Mi Lista</h1>
+    <span class="version-badge" id="versionBadge"></span>
+  </div>
+  <p class="header-sub" id="headerSub">Tu lista está vacía</p>
   <div class="progress-wrap">
     <div class="progress-fill" id="progressFill"></div>
   </div>
-  <p class="progress-text" id="progressText">Lista vacía</p>
+  <p class="progress-text" id="progressText"></p>
 </header>
+
+<!-- ── Frecuentes ─────────────────────────────────── -->
+<section id="frecuentes" class="frecuentes-section" style="display:none">
+  <p class="frecuentes-label">⚡ Frecuentes</p>
+  <div id="frecuentesChips" class="frecuentes-chips"></div>
+</section>
 
 <!-- ── Add item ───────────────────────────────────── -->
 <div class="add-card">
   <div class="input-row">
-    <input type="text" id="manualInput" placeholder="Agregar producto..." autocomplete="off" autocorrect="off" autocapitalize="sentences">
+    <input type="text" id="manualInput" placeholder="¿Qué necesitás?" autocomplete="off" autocorrect="off" autocapitalize="sentences">
     <button class="btn-add" onclick="agregarManual()" aria-label="Agregar">+</button>
   </div>
   <div class="cat-chips" id="catChips"></div>
@@ -520,6 +665,9 @@
   <button class="btn-scan-tool" onclick="activarEscaneo()">
     <span style="font-size:20px;line-height:1">📷</span>
     Escanear
+  </button>
+  <button class="btn-whatsapp" id="btnWhatsapp" onclick="compartirWhatsApp()" disabled title="Compartir por WhatsApp">
+    💬
   </button>
   <button class="btn-finalizar" id="btnFinalizar" onclick="abrirResumenFinal()" disabled>
     Finalizar
@@ -572,7 +720,7 @@
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
 
-const APP_VERSION = 'v1.3.0';
+const APP_VERSION = 'v2.0.0';
 document.getElementById('versionBadge').textContent = APP_VERSION;
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -593,14 +741,16 @@ const CAT_MAP = Object.fromEntries(CATEGORIAS.map(c => [c.nombre, c]));
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-let lista = JSON.parse(localStorage.getItem('lista_super')) || [];
+let lista             = JSON.parse(localStorage.getItem('lista_super'))      || [];
 let productosConocidos = JSON.parse(localStorage.getItem('diccionario_super')) || {};
+let historial         = JSON.parse(localStorage.getItem('historial_super'))  || {};
 
-// Backward compatibility: migrate old string values
+// Backward compatibility
 lista = lista.map(p => ({
-  nombre:   p.nombre,
-  comprado: p.comprado || false,
+  nombre:    p.nombre,
+  comprado:  p.comprado  || false,
   categoria: p.categoria || 'Otros',
+  cantidad:  p.cantidad  || 1,
 }));
 Object.keys(productosConocidos).forEach(k => {
   if (typeof productosConocidos[k] === 'string') {
@@ -613,6 +763,85 @@ let catNuevo        = 'Otros';
 let codigoPendiente = null;
 let quaggaRunning   = false;
 
+// ── Historial ─────────────────────────────────────────────────────────────────
+
+function actualizarHistorial(nombre, categoria) {
+  const key = nombre.toLowerCase().trim();
+  if (historial[key]) {
+    historial[key].veces++;
+    historial[key].nombre    = nombre;
+    historial[key].categoria = categoria;
+  } else {
+    historial[key] = { nombre, categoria, veces: 1 };
+  }
+  localStorage.setItem('historial_super', JSON.stringify(historial));
+}
+
+function getFrecuentes(n = 8) {
+  const enLista = new Set(lista.map(p => p.nombre.toLowerCase().trim()));
+  return Object.values(historial)
+    .filter(h => !enLista.has(h.nombre.toLowerCase().trim()))
+    .sort((a, b) => b.veces - a.veces)
+    .slice(0, n);
+}
+
+function renderFrecuentes() {
+  const section  = document.getElementById('frecuentes');
+  const chipsEl  = document.getElementById('frecuentesChips');
+  const items    = getFrecuentes(8);
+  if (items.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  chipsEl.innerHTML = '';
+  items.forEach(h => {
+    const cat = CAT_MAP[h.categoria] || CAT_MAP['Otros'];
+    const btn = document.createElement('button');
+    btn.className   = 'frec-chip';
+    btn.textContent = cat.emoji + ' ' + h.nombre;
+    btn.onclick     = () => agregarDesdeFrecuentes(h.nombre.toLowerCase().trim());
+    chipsEl.appendChild(btn);
+  });
+}
+
+function agregarDesdeFrecuentes(key) {
+  const h = historial[key];
+  if (!h) return;
+  lista.push({ nombre: h.nombre, comprado: false, categoria: h.categoria, cantidad: 1 });
+  actualizarHistorial(h.nombre, h.categoria);
+  render();
+  mostrarToast('➕ ' + h.nombre + ' añadido');
+}
+
+// ── Cantidad ──────────────────────────────────────────────────────────────────
+
+function cambiarCantidad(index, delta) {
+  const actual = lista[index].cantidad || 1;
+  const nueva  = actual + delta;
+  if (nueva < 1) return;
+  lista[index].cantidad = nueva;
+  render();
+}
+
+// ── WhatsApp ──────────────────────────────────────────────────────────────────
+
+function compartirWhatsApp() {
+  const pendientes = lista.filter(p => !p.comprado);
+  if (pendientes.length === 0) { mostrarToast('No hay pendientes para compartir'); return; }
+
+  let texto = '🛒 *Mi Lista del Súper*\n';
+  CATEGORIAS.forEach(cat => {
+    const items = pendientes.filter(p => p.categoria === cat.nombre);
+    if (items.length === 0) return;
+    texto += `\n${cat.emoji} *${cat.nombre}*\n`;
+    items.forEach(p => {
+      const qty = p.cantidad || 1;
+      texto += `• ${p.nombre}${qty > 1 ? ' ×' + qty : ''}\n`;
+    });
+  });
+  texto += '\n_Generado con Mi Súper App_';
+
+  window.open('https://wa.me/?text=' + encodeURIComponent(texto));
+}
+
 // ── Chips ─────────────────────────────────────────────────────────────────────
 
 function renderChips(containerId, selected, onSelect) {
@@ -621,28 +850,18 @@ function renderChips(containerId, selected, onSelect) {
   cont.innerHTML = '';
   CATEGORIAS.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'chip' + (cat.nombre === selected ? ' selected' : '');
+    btn.className   = 'chip' + (cat.nombre === selected ? ' selected' : '');
     btn.textContent = cat.emoji + ' ' + cat.nombre.split(' y ')[0].split(' ')[0];
-    btn.onclick = () => onSelect(cat.nombre);
+    btn.onclick     = () => onSelect(cat.nombre);
     cont.appendChild(btn);
   });
 }
 
-function initCatChips() {
-  renderChips('catChips', catActual, selectCatManual);
-}
-function selectCatManual(c) {
-  catActual = c;
-  initCatChips();
-}
+function initCatChips()    { renderChips('catChips',      catActual, selectCatManual); }
+function selectCatManual(c){ catActual = c; initCatChips(); }
 
-function initModalCatChips() {
-  renderChips('catChipsModal', catNuevo, selectCatNuevo);
-}
-function selectCatNuevo(c) {
-  catNuevo = c;
-  initModalCatChips();
-}
+function initModalCatChips()  { renderChips('catChipsModal', catNuevo, selectCatNuevo); }
+function selectCatNuevo(c)    { catNuevo = c; initModalCatChips(); }
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
@@ -655,25 +874,35 @@ function escapeHtml(str) {
 }
 
 function render() {
-  const cont     = document.getElementById('listaContenedor');
-  const total    = lista.length;
+  const cont      = document.getElementById('listaContenedor');
+  const total     = lista.length;
   const comprados = lista.filter(p => p.comprado).length;
   const pendientes = total - comprados;
 
   // Progress
   const pct = total === 0 ? 0 : Math.round((comprados / total) * 100);
   document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent =
-    total === 0
-      ? 'Lista vacía'
-      : comprados === total
-        ? '¡Todo comprado! 🎉'
-        : `${comprados} de ${total} productos comprados`;
 
-  // Toolbar button
-  const btn   = document.getElementById('btnFinalizar');
-  const badge = document.getElementById('pendienteBadge');
-  btn.disabled = total === 0;
+  // Header subtitle
+  const sub = document.getElementById('headerSub');
+  if (total === 0) {
+    sub.textContent = 'Tu lista está vacía';
+  } else if (comprados === total) {
+    sub.textContent = '¡Todo comprado! 🎉';
+  } else {
+    sub.textContent = `${pendientes} pendiente${pendientes !== 1 ? 's' : ''} · ${comprados} listo${comprados !== 1 ? 's' : ''}`;
+  }
+
+  // Progress text
+  document.getElementById('progressText').textContent =
+    total > 0 ? `${comprados} de ${total} productos` : '';
+
+  // Toolbar
+  const btn    = document.getElementById('btnFinalizar');
+  const btnWA  = document.getElementById('btnWhatsapp');
+  const badge  = document.getElementById('pendienteBadge');
+  btn.disabled   = total === 0;
+  btnWA.disabled = pendientes === 0;
   if (pendientes > 0) {
     badge.style.display = 'inline';
     badge.textContent   = pendientes + ' pend.';
@@ -684,12 +913,15 @@ function render() {
   // Save
   localStorage.setItem('lista_super', JSON.stringify(lista));
 
+  // Frecuentes
+  renderFrecuentes();
+
   // Empty state
   if (total === 0) {
     cont.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">🛒</div>
-        <p>Tu lista está vacía.<br>Agrega productos arriba o escanea un código.</p>
+        <div class="empty-icon">🛍️</div>
+        <p><strong>¡Empecemos!</strong><br>Agrega productos arriba<br>o escanea un código de barras.</p>
       </div>`;
     return;
   }
@@ -702,7 +934,7 @@ function render() {
       .filter(p => p.categoria === cat.nombre);
     if (items.length === 0) return;
 
-    const section  = document.createElement('div');
+    const section   = document.createElement('div');
     section.className = 'cat-section';
     const doneCount = items.filter(p => p.comprado).length;
     const allDone   = doneCount === items.length;
@@ -716,12 +948,23 @@ function render() {
     section.appendChild(header);
 
     items.forEach(p => {
+      const qty = p.cantidad || 1;
       const div = document.createElement('div');
       div.className = 'item-row' + (p.comprado ? ' comprado' : '');
-      div.onclick = () => toggleComprado(p.idx);
+      div.onclick   = () => toggleComprado(p.idx);
+
+      const stepperHtml = !p.comprado
+        ? `<div class="qty-stepper" onclick="event.stopPropagation()">
+             <button class="qty-btn" onclick="cambiarCantidad(${p.idx},-1)" ${qty <= 1 ? 'disabled' : ''}>−</button>
+             <span class="qty-num">${qty}</span>
+             <button class="qty-btn" onclick="cambiarCantidad(${p.idx},1)">+</button>
+           </div>`
+        : `<span class="qty-done">${qty > 1 ? '×' + qty : ''}</span>`;
+
       div.innerHTML = `
         <span class="item-emoji">${cat.emoji}</span>
         <span class="item-nombre">${escapeHtml(p.nombre)}</span>
+        ${stepperHtml}
         <span class="item-check">${p.comprado ? '✓' : ''}</span>
         <button class="btn-delete" onclick="borrarItem(${p.idx},event)" aria-label="Borrar">✕</button>`;
       section.appendChild(div);
@@ -749,7 +992,8 @@ function agregarManual() {
   const input  = document.getElementById('manualInput');
   const nombre = input.value.trim();
   if (!nombre) { input.focus(); return; }
-  lista.push({ nombre, comprado: false, categoria: catActual });
+  lista.push({ nombre, comprado: false, categoria: catActual, cantidad: 1 });
+  actualizarHistorial(nombre, catActual);
   input.value = '';
   render();
   input.focus();
@@ -806,7 +1050,8 @@ async function handleDetected(data) {
       existente.comprado = true;
       mostrarToast('✅ ' + conocido.nombre + ' marcado como comprado');
     } else {
-      lista.push({ nombre: conocido.nombre, comprado: false, categoria: conocido.categoria || 'Otros' });
+      lista.push({ nombre: conocido.nombre, comprado: false, categoria: conocido.categoria || 'Otros', cantidad: 1 });
+      actualizarHistorial(conocido.nombre, conocido.categoria || 'Otros');
       mostrarToast('➕ ' + conocido.nombre + ' añadido');
     }
     render();
@@ -814,7 +1059,6 @@ async function handleDetected(data) {
     mostrarToast('🔍 Buscando producto...');
     let nombreSugerido = '';
 
-    // Helper: extraer nombre de un producto de Open Food Facts
     function extraerNombreOFF(p) {
       const nombre = (
         p.product_name_en || p.product_name_es || p.product_name ||
@@ -829,9 +1073,7 @@ async function handleDetected(data) {
       // 1️⃣ Open Food Facts US (mejor cobertura para Puerto Rico)
       const r1 = await fetch(`https://us.openfoodfacts.org/api/v0/product/${codigo}.json`);
       const j1 = await r1.json();
-      if (j1.status === 1 && j1.product) {
-        nombreSugerido = extraerNombreOFF(j1.product);
-      }
+      if (j1.status === 1 && j1.product) nombreSugerido = extraerNombreOFF(j1.product);
     } catch (_) {}
 
     if (!nombreSugerido) {
@@ -839,9 +1081,7 @@ async function handleDetected(data) {
         // 2️⃣ Open Food Facts global
         const r2 = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo}.json`);
         const j2 = await r2.json();
-        if (j2.status === 1 && j2.product) {
-          nombreSugerido = extraerNombreOFF(j2.product);
-        }
+        if (j2.status === 1 && j2.product) nombreSugerido = extraerNombreOFF(j2.product);
       } catch (_) {}
     }
 
@@ -857,9 +1097,7 @@ async function handleDetected(data) {
       } catch (_) {}
     }
 
-    if (!nombreSugerido) {
-      mostrarToast('⚠️ Producto no encontrado en ninguna base de datos');
-    }
+    if (!nombreSugerido) mostrarToast('⚠️ Producto no encontrado en ninguna base de datos');
     abrirModalNuevoProducto(codigo, nombreSugerido);
   }
 }
@@ -873,8 +1111,8 @@ function abrirModalNuevoProducto(codigo, nombreSugerido = '') {
   document.getElementById('nombreNuevo').value = nombreSugerido;
   const subtitle = document.getElementById('modalNuevoSubtitle');
   if (nombreSugerido) {
-    subtitle.textContent = '✨ Nombre encontrado automáticamente — podés editarlo';
-    subtitle.style.display = '';
+    subtitle.textContent    = '✨ Nombre encontrado automáticamente — podés editarlo';
+    subtitle.style.display  = '';
   } else {
     subtitle.style.display = 'none';
   }
@@ -892,7 +1130,8 @@ function confirmarNuevoProducto() {
   if (!nombre) { document.getElementById('nombreNuevo').focus(); return; }
   productosConocidos[codigoPendiente] = { nombre, categoria: catNuevo };
   localStorage.setItem('diccionario_super', JSON.stringify(productosConocidos));
-  lista.push({ nombre, comprado: false, categoria: catNuevo });
+  lista.push({ nombre, comprado: false, categoria: catNuevo, cantidad: 1 });
+  actualizarHistorial(nombre, catNuevo);
   cancelarNuevoProducto();
   render();
   mostrarToast('➕ ' + nombre + ' añadido');
@@ -920,10 +1159,12 @@ function abrirResumenFinal() {
   faltantes.forEach(p => {
     const idx = lista.indexOf(p);
     const cat = CAT_MAP[p.categoria] || CAT_MAP['Otros'];
+    const qty = p.cantidad || 1;
     const row = document.createElement('div');
     row.className = 'faltante-row';
     row.innerHTML = `
       <span>${cat.emoji} ${escapeHtml(p.nombre)}</span>
+      ${qty > 1 ? `<span class="qty-label">×${qty}</span>` : ''}
       <button class="btn-del-faltante" onclick="borrarFaltante(${idx})">Borrar</button>`;
     cont.appendChild(row);
   });
