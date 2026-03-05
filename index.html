@@ -647,12 +647,12 @@
       100% { opacity: 0; }
     }
 
-    /* ── Sync modal ──────────────────────────────────── */
-    .btn-link-devices {
+    /* ── Logout button ───────────────────────────────── */
+    .btn-logout {
       background: rgba(255,255,255,0.15);
       border: none;
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       width: 30px; height: 30px;
       border-radius: 50%;
       cursor: pointer;
@@ -660,31 +660,81 @@
       flex-shrink: 0;
       -webkit-tap-highlight-color: transparent;
     }
-    .btn-link-devices:active { background: rgba(255,255,255,0.28); }
-    .code-box {
-      background: #f5f5f5;
-      border-radius: 12px;
-      padding: 14px;
-      font-family: monospace;
-      font-size: 13px;
-      word-break: break-all;
-      color: var(--text);
-      margin-bottom: 10px;
-      line-height: 1.5;
+    .btn-logout:active { background: rgba(255,255,255,0.28); }
+
+    /* ── Login screen ────────────────────────────────── */
+    #loginScreen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      padding-top: max(24px, env(safe-area-inset-top));
     }
-    .btn-copy {
+    .login-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 24px;
       width: 100%;
-      padding: 12px;
+      max-width: 380px;
+    }
+    .login-logo { font-size: 48px; text-align: center; margin-bottom: 8px; }
+    .login-card h2 { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+    .login-card p.login-sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
+    .login-card input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e8e8e8;
       border-radius: 12px;
-      border: none;
-      background: var(--primary-light);
-      color: var(--primary-dark);
       font-family: var(--font);
-      font-size: 14px;
+      font-size: 15px;
+      outline: none;
+      color: var(--text);
+      margin-bottom: 11px;
+      transition: border-color 0.2s;
+    }
+    .login-card input:focus { border-color: var(--primary); }
+    .auth-error {
+      font-size: 13px;
+      color: var(--danger);
+      text-align: center;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .btn-auth-primary {
+      width: 100%;
+      padding: 15px;
+      border-radius: 13px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-family: var(--font);
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+      transition: background 0.15s;
     }
+    .btn-auth-primary:active { background: var(--primary-dark); }
+    .btn-auth-primary:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-auth-secondary {
+      width: 100%;
+      padding: 13px;
+      border-radius: 13px;
+      border: 2px solid #e8e8e8;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .btn-auth-secondary:active { border-color: var(--primary); color: var(--primary); }
   </style>
 </head>
 <body>
@@ -696,7 +746,7 @@
     <div class="header-badges">
       <span class="version-badge" id="versionBadge"></span>
       <span class="sync-badge" id="syncBadge"></span>
-      <button class="btn-link-devices" onclick="abrirModalDispositivos()" title="Compartir lista entre dispositivos">🔗</button>
+      <button class="btn-logout" onclick="cerrarSesion()" title="Cerrar sesión">⏻</button>
     </div>
   </div>
   <p class="header-sub" id="headerSub">Tu lista está vacía</p>
@@ -781,20 +831,17 @@
   </div>
 </div>
 
-<!-- ── Modal: dispositivos ───────────────────────────── -->
-<div id="modalDispositivos" class="modal-overlay">
-  <div class="modal-card">
-    <h3>Compartir entre dispositivos</h3>
-    <p class="modal-subtitle">Copiá este código en tu otro dispositivo para sincronizar la misma lista.</p>
-    <p class="modal-label">Tu código de lista</p>
-    <div class="code-box" id="codigoDispositivo"></div>
-    <button class="btn-copy" onclick="copiarCodigo()">📋 Copiar código</button>
-    <p class="modal-label">Pegar código de otro dispositivo</p>
-    <input type="text" id="inputCodigo" placeholder="Pegá el código aquí" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="cerrarModalDispositivos()">Cancelar</button>
-      <button class="btn-primary" onclick="conectarCodigo()">Conectar</button>
-    </div>
+<!-- ── Login screen ───────────────────────────────────── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">🛒</div>
+    <h2>Mi Lista</h2>
+    <p class="login-sub">Iniciá sesión para acceder a tu lista</p>
+    <input type="email"    id="authEmail" placeholder="Email"       autocomplete="email"            autocapitalize="none">
+    <input type="password" id="authPass"  placeholder="Contraseña"  autocomplete="current-password">
+    <p class="auth-error" id="authError"></p>
+    <button class="btn-auth-primary"   id="btnLogin"     onclick="iniciarSesion()">Entrar</button>
+    <button class="btn-auth-secondary" id="btnRegistrar" onclick="registrarse()">Registrarme</button>
   </div>
 </div>
 
@@ -807,12 +854,80 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function getUserId() {
-  let id = localStorage.getItem('mercado_user_id');
-  if (!id) { id = crypto.randomUUID(); localStorage.setItem('mercado_user_id', id); }
-  return id;
+let USER_ID = null;
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+function mostrarApp() {
+  document.getElementById('loginScreen').style.display = 'none';
 }
-const USER_ID = getUserId();
+function mostrarLogin() {
+  document.getElementById('loginScreen').style.display = '';
+  document.getElementById('authEmail').value = '';
+  document.getElementById('authPass').value  = '';
+  document.getElementById('authError').style.display = 'none';
+}
+function mostrarAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.display = '';
+}
+
+async function iniciarSesion() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pass  = document.getElementById('authPass').value;
+  if (!email || !pass) return;
+  const btn = document.getElementById('btnLogin');
+  btn.disabled    = true;
+  btn.textContent = 'Entrando...';
+  const { error } = await _supabase.auth.signInWithPassword({ email, password: pass });
+  if (error) { mostrarAuthError('Email o contraseña incorrectos'); }
+  btn.disabled    = false;
+  btn.textContent = 'Entrar';
+}
+
+async function registrarse() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pass  = document.getElementById('authPass').value;
+  if (!email || !pass) return;
+  const btn = document.getElementById('btnRegistrar');
+  btn.disabled    = true;
+  btn.textContent = 'Registrando...';
+  const { error } = await _supabase.auth.signUp({ email, password: pass });
+  if (error) {
+    mostrarAuthError('No se pudo registrar: ' + error.message);
+  } else {
+    mostrarAuthError('✅ Revisá tu email para confirmar la cuenta');
+    document.getElementById('authError').style.color = 'var(--success)';
+  }
+  btn.disabled    = false;
+  btn.textContent = 'Registrarme';
+}
+
+async function cerrarSesion() {
+  await _supabase.auth.signOut();
+}
+
+async function initAuth() {
+  const { data: { session } } = await _supabase.auth.getSession();
+  if (session) {
+    USER_ID = session.user.id;
+    mostrarApp();
+    loadFromSupabase();
+  } else {
+    mostrarLogin();
+  }
+  _supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+      USER_ID = session.user.id;
+      mostrarApp();
+      loadFromSupabase();
+    } else {
+      USER_ID = null;
+      mostrarLogin();
+    }
+  });
+}
 
 function setSyncStatus(status) {
   const el = document.getElementById('syncBadge');
@@ -882,7 +997,7 @@ async function loadFromSupabase() {
 
 // ── Version ───────────────────────────────────────────────────────────────────
 
-const APP_VERSION = 'v2.1.0';
+const APP_VERSION = 'v2.2.0';
 document.getElementById('versionBadge').textContent = APP_VERSION;
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -1368,35 +1483,6 @@ function mostrarToast(msg) {
   setTimeout(() => { if (t.parentNode) t.remove(); }, 2700);
 }
 
-// ── Modal dispositivos ────────────────────────────────────────────────────────
-
-function abrirModalDispositivos() {
-  document.getElementById('codigoDispositivo').textContent = USER_ID;
-  document.getElementById('inputCodigo').value = '';
-  document.getElementById('modalDispositivos').classList.add('active');
-}
-
-function cerrarModalDispositivos() {
-  document.getElementById('modalDispositivos').classList.remove('active');
-}
-
-function copiarCodigo() {
-  navigator.clipboard.writeText(USER_ID).then(() => {
-    mostrarToast('📋 Código copiado');
-  }).catch(() => {
-    mostrarToast('Copiá el código manualmente');
-  });
-}
-
-async function conectarCodigo() {
-  const codigo = document.getElementById('inputCodigo').value.trim();
-  if (!codigo) { document.getElementById('inputCodigo').focus(); return; }
-  localStorage.setItem('mercado_user_id', codigo);
-  cerrarModalDispositivos();
-  mostrarToast('🔗 Conectando...');
-  location.reload();
-}
-
 // ── Backdrop close ────────────────────────────────────────────────────────────
 
 document.getElementById('modalNuevoProducto').addEventListener('click', function(e) {
@@ -1405,8 +1491,8 @@ document.getElementById('modalNuevoProducto').addEventListener('click', function
 document.getElementById('modalResumen').addEventListener('click', function(e) {
   if (e.target === this) cerrarResumen();
 });
-document.getElementById('modalDispositivos').addEventListener('click', function(e) {
-  if (e.target === this) cerrarModalDispositivos();
+document.getElementById('authPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') iniciarSesion();
 });
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
@@ -1419,7 +1505,7 @@ document.addEventListener('keydown', e => {
 
 initCatChips();
 render();
-loadFromSupabase(); // carga desde Supabase y re-renderiza si hay datos más nuevos
+initAuth();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
