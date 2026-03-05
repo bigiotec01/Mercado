@@ -646,6 +646,45 @@
       75%  { opacity: 1; }
       100% { opacity: 0; }
     }
+
+    /* ── Sync modal ──────────────────────────────────── */
+    .btn-link-devices {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      font-size: 16px;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-link-devices:active { background: rgba(255,255,255,0.28); }
+    .code-box {
+      background: #f5f5f5;
+      border-radius: 12px;
+      padding: 14px;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .btn-copy {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
@@ -657,6 +696,7 @@
     <div class="header-badges">
       <span class="version-badge" id="versionBadge"></span>
       <span class="sync-badge" id="syncBadge"></span>
+      <button class="btn-link-devices" onclick="abrirModalDispositivos()" title="Compartir lista entre dispositivos">🔗</button>
     </div>
   </div>
   <p class="header-sub" id="headerSub">Tu lista está vacía</p>
@@ -737,6 +777,23 @@
     <div class="modal-actions">
       <button class="btn-secondary" onclick="cerrarResumen()">Volver</button>
       <button class="btn-success"   onclick="confirmarYLimpiar()">Guardar y salir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: dispositivos ───────────────────────────── -->
+<div id="modalDispositivos" class="modal-overlay">
+  <div class="modal-card">
+    <h3>Compartir entre dispositivos</h3>
+    <p class="modal-subtitle">Copiá este código en tu otro dispositivo para sincronizar la misma lista.</p>
+    <p class="modal-label">Tu código de lista</p>
+    <div class="code-box" id="codigoDispositivo"></div>
+    <button class="btn-copy" onclick="copiarCodigo()">📋 Copiar código</button>
+    <p class="modal-label">Pegar código de otro dispositivo</p>
+    <input type="text" id="inputCodigo" placeholder="Pegá el código aquí" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="cerrarModalDispositivos()">Cancelar</button>
+      <button class="btn-primary" onclick="conectarCodigo()">Conectar</button>
     </div>
   </div>
 </div>
@@ -1311,6 +1368,35 @@ function mostrarToast(msg) {
   setTimeout(() => { if (t.parentNode) t.remove(); }, 2700);
 }
 
+// ── Modal dispositivos ────────────────────────────────────────────────────────
+
+function abrirModalDispositivos() {
+  document.getElementById('codigoDispositivo').textContent = USER_ID;
+  document.getElementById('inputCodigo').value = '';
+  document.getElementById('modalDispositivos').classList.add('active');
+}
+
+function cerrarModalDispositivos() {
+  document.getElementById('modalDispositivos').classList.remove('active');
+}
+
+function copiarCodigo() {
+  navigator.clipboard.writeText(USER_ID).then(() => {
+    mostrarToast('📋 Código copiado');
+  }).catch(() => {
+    mostrarToast('Copiá el código manualmente');
+  });
+}
+
+async function conectarCodigo() {
+  const codigo = document.getElementById('inputCodigo').value.trim();
+  if (!codigo) { document.getElementById('inputCodigo').focus(); return; }
+  localStorage.setItem('mercado_user_id', codigo);
+  cerrarModalDispositivos();
+  mostrarToast('🔗 Conectando...');
+  location.reload();
+}
+
 // ── Backdrop close ────────────────────────────────────────────────────────────
 
 document.getElementById('modalNuevoProducto').addEventListener('click', function(e) {
@@ -1318,6 +1404,9 @@ document.getElementById('modalNuevoProducto').addEventListener('click', function
 });
 document.getElementById('modalResumen').addEventListener('click', function(e) {
   if (e.target === this) cerrarResumen();
+});
+document.getElementById('modalDispositivos').addEventListener('click', function(e) {
+  if (e.target === this) cerrarModalDispositivos();
 });
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
