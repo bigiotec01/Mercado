@@ -735,6 +735,42 @@
       transition: border-color 0.15s;
     }
     .btn-auth-secondary:active { border-color: var(--primary); color: var(--primary); }
+
+    /* ── Cat nav bar ─────────────────────────────────── */
+    .cat-nav-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bg);
+      padding: 8px 14px;
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .cat-nav-bar::-webkit-scrollbar { display: none; }
+    .cat-nav-chip {
+      flex-shrink: 0;
+      padding: 6px 13px;
+      border-radius: 99px;
+      border: 2px solid transparent;
+      background: var(--card);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cat-nav-chip.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+    .cat-nav-chip:active { transform: scale(0.93); }
   </style>
 </head>
 <body>
@@ -770,6 +806,9 @@
   </div>
   <div class="cat-chips" id="catChips"></div>
 </div>
+
+<!-- ── Cat nav bar ───────────────────────────────── -->
+<div id="catNavBar" class="cat-nav-bar" style="display:none"></div>
 
 <!-- ── List ──────────────────────────────────────── -->
 <main id="listaContenedor"></main>
@@ -1000,7 +1039,7 @@ async function loadFromSupabase() {
 
 // ── Version ───────────────────────────────────────────────────────────────────
 
-const APP_VERSION = 'v2.2.0';
+const APP_VERSION = 'v2.3.0';
 document.getElementById('versionBadge').textContent = APP_VERSION;
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -1143,6 +1182,44 @@ function selectCatManual(c){ catActual = c; initCatChips(); }
 function initModalCatChips()  { renderChips('catChipsModal', catNuevo, selectCatNuevo); }
 function selectCatNuevo(c)    { catNuevo = c; initModalCatChips(); }
 
+// ── Cat nav bar ───────────────────────────────────────────────────────────────
+
+let _catObserver = null;
+
+function renderCatNav() {
+  const bar = document.getElementById('catNavBar');
+  const catsConItems = CATEGORIAS.filter(cat => lista.some(p => p.categoria === cat.nombre));
+  if (catsConItems.length <= 1) { bar.style.display = 'none'; return; }
+  bar.style.display = '';
+  bar.innerHTML = '';
+  catsConItems.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className   = 'cat-nav-chip';
+    btn.id          = 'nav-' + cat.nombre;
+    btn.textContent = cat.emoji + ' ' + cat.nombre.split(' y ')[0].split(' ')[0];
+    btn.onclick     = () => {
+      const sec = document.getElementById('sec-' + cat.nombre);
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    bar.appendChild(btn);
+  });
+}
+
+function initCatObserver() {
+  if (_catObserver) _catObserver.disconnect();
+  _catObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const chip = document.getElementById('nav-' + entry.target.dataset.cat);
+      if (!chip) return;
+      document.querySelectorAll('.cat-nav-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+  }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+  document.querySelectorAll('.cat-section[data-cat]').forEach(el => _catObserver.observe(el));
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 
 function escapeHtml(str) {
@@ -1216,7 +1293,9 @@ function render() {
     if (items.length === 0) return;
 
     const section   = document.createElement('div');
-    section.className = 'cat-section';
+    section.className  = 'cat-section';
+    section.id         = 'sec-' + cat.nombre;
+    section.dataset.cat = cat.nombre;
     const doneCount = items.filter(p => p.comprado).length;
     const allDone   = doneCount === items.length;
 
@@ -1253,6 +1332,9 @@ function render() {
 
     cont.appendChild(section);
   });
+
+  renderCatNav();
+  requestAnimationFrame(initCatObserver);
 }
 
 // ── Actions ───────────────────────────────────────────────────────────────────
