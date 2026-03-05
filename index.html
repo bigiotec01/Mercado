@@ -289,8 +289,14 @@
     .item-row.comprado { opacity: 0.42; }
 
     .item-emoji { font-size: 18px; flex-shrink: 0; line-height: 1; }
-    .item-nombre {
+    .item-info {
       flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .item-nombre {
       font-size: 15px;
       font-weight: 600;
       line-height: 1.3;
@@ -299,10 +305,30 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    .item-nota {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+    .item-fijo-pin { font-size: 12px; flex-shrink: 0; opacity: 0.55; }
     .item-row.comprado .item-nombre {
       text-decoration: line-through;
       color: var(--text-muted);
     }
+    .btn-opts {
+      width: 28px; height: 28px;
+      border: none; background: none;
+      color: #ccc; font-size: 20px;
+      cursor: pointer; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; padding: 0; line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-opts:active { color: var(--primary); background: var(--primary-light); }
 
     /* Quantity stepper */
     .qty-stepper {
@@ -736,6 +762,79 @@
     }
     .btn-auth-secondary:active { border-color: var(--primary); color: var(--primary); }
 
+    /* ── Search ──────────────────────────────────────── */
+    .btn-search-toggle {
+      width: 48px; height: 48px;
+      background: #f0f0f0; border: none; border-radius: 12px;
+      font-size: 19px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-search-toggle.active { background: var(--primary-light); }
+    .btn-search-toggle:active  { background: #ddd; }
+    .search-input-wrap { padding: 10px 0 4px; }
+    .search-input {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid #e8e8e8; border-radius: 12px;
+      font-family: var(--font); font-size: 15px;
+      outline: none; color: var(--text); background: #f8f8f8;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--primary); background: white; }
+
+    /* ── Total estimado ──────────────────────────────── */
+    .total-estimado {
+      font-size: 12px; font-weight: 700;
+      opacity: 0.85; margin-top: 5px;
+      text-align: right; color: rgba(255,255,255,0.9);
+    }
+
+    /* ── Edit item modal ─────────────────────────────── */
+    .fijo-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 14px 0; border-top: 1px solid #f0f0f0;
+      margin-top: 10px; gap: 12px;
+    }
+    .fijo-row-label { font-size: 15px; font-weight: 600; }
+    .fijo-row-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .toggle-switch {
+      width: 46px; height: 26px; border-radius: 99px;
+      background: #ddd; border: none; position: relative;
+      cursor: pointer; flex-shrink: 0;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .toggle-switch.on { background: var(--primary); }
+    .toggle-switch::after {
+      content: ''; position: absolute;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: white; top: 3px; left: 3px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+    .toggle-switch.on::after { transform: translateX(20px); }
+
+    /* ── Reordenar categorías ─────────────────────────── */
+    .cat-reorder-item {
+      display: flex; align-items: center;
+      gap: 10px; padding: 12px 4px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .cat-reorder-emoji  { font-size: 20px; flex-shrink: 0; }
+    .cat-reorder-nombre { flex: 1; font-size: 15px; font-weight: 600; }
+    .cat-reorder-btns   { display: flex; gap: 6px; }
+    .btn-reorder {
+      width: 34px; height: 34px; border-radius: 10px;
+      border: 1.5px solid #e0e0e0; background: white;
+      font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-reorder:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-reorder:not(:disabled):active { background: var(--primary-light); border-color: var(--primary); }
+
     /* ── Cat nav bar ─────────────────────────────────── */
     .cat-nav-bar {
       position: sticky;
@@ -790,6 +889,7 @@
     <div class="progress-fill" id="progressFill"></div>
   </div>
   <p class="progress-text" id="progressText"></p>
+  <p class="total-estimado" id="totalEstimado" style="display:none"></p>
 </header>
 
 <!-- ── Frecuentes ─────────────────────────────────── -->
@@ -802,7 +902,11 @@
 <div class="add-card">
   <div class="input-row">
     <input type="text" id="manualInput" placeholder="¿Qué necesitás?" autocomplete="off" autocorrect="off" autocapitalize="sentences">
+    <button class="btn-search-toggle" id="btnSearchToggle" onclick="toggleSearch()" title="Buscar en lista">🔍</button>
     <button class="btn-add" onclick="agregarManual()" aria-label="Agregar">+</button>
+  </div>
+  <div id="searchBar" style="display:none" class="search-input-wrap">
+    <input type="search" id="searchInput" class="search-input" placeholder="Buscar en lista…" autocomplete="off" autocorrect="off" autocapitalize="none">
   </div>
   <div class="cat-chips" id="catChips"></div>
 </div>
@@ -881,6 +985,41 @@
     <p class="auth-error" id="authError"></p>
     <button class="btn-auth-primary"   id="btnLogin"     onclick="iniciarSesion()">Entrar</button>
     <button class="btn-auth-secondary" id="btnRegistrar" onclick="registrarse()">Registrarme</button>
+  </div>
+</div>
+
+<!-- ── Modal: editar item ────────────────────────── -->
+<div id="modalEditarItem" class="modal-overlay">
+  <div class="modal-card">
+    <h3 id="editarTitulo"></h3>
+    <p class="modal-label">Nota</p>
+    <input type="text" id="editarNota" placeholder="ej: orgánico, 2L, marca X…" autocomplete="off">
+    <p class="modal-label">Precio estimado</p>
+    <input type="number" id="editarPrecio" placeholder="0.00" step="0.01" min="0" inputmode="decimal">
+    <div class="fijo-row">
+      <div>
+        <p class="fijo-row-label">📌 Siempre en lista</p>
+        <p class="fijo-row-desc">No se puede borrar accidentalmente</p>
+      </div>
+      <button class="toggle-switch" id="editarFijoToggle" onclick="toggleFijoEdit()"></button>
+    </div>
+    <div class="modal-actions" style="margin-top:8px">
+      <button class="btn-secondary" onclick="cerrarEditarItem()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarEditarItem()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: reordenar categorías ───────────────── -->
+<div id="modalReordenar" class="modal-overlay">
+  <div class="modal-card">
+    <h3>Pasillos</h3>
+    <p class="modal-subtitle">Ordená las categorías según los pasillos de tu super</p>
+    <div id="reordenarLista"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="cerrarReordenar()">Cancelar</button>
+      <button class="btn-primary"   onclick="confirmarReordenar()">Guardar</button>
+    </div>
   </div>
 </div>
 
@@ -1039,7 +1178,7 @@ async function loadFromSupabase() {
 
 // ── Version ───────────────────────────────────────────────────────────────────
 
-const APP_VERSION = 'v2.3.0';
+const APP_VERSION = 'v2.4.0';
 document.getElementById('versionBadge').textContent = APP_VERSION;
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -1058,6 +1197,15 @@ const CATEGORIAS = [
 
 const CAT_MAP = Object.fromEntries(CATEGORIAS.map(c => [c.nombre, c]));
 
+// Orden de categorías personalizable (localStorage, no sync a Supabase)
+let catOrden = (() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem('cat_orden_super'));
+    if (Array.isArray(saved) && saved.length === CATEGORIAS.length) return saved;
+  } catch(_) {}
+  return CATEGORIAS.map(c => c.nombre);
+})();
+
 // ── State ─────────────────────────────────────────────────────────────────────
 
 let lista             = JSON.parse(localStorage.getItem('lista_super'))      || [];
@@ -1070,6 +1218,9 @@ lista = lista.map(p => ({
   comprado:  p.comprado  || false,
   categoria: p.categoria || 'Otros',
   cantidad:  p.cantidad  || 1,
+  nota:      p.nota      || '',
+  precio:    p.precio    != null ? p.precio : null,
+  fijo:      p.fijo      || false,
 }));
 Object.keys(productosConocidos).forEach(k => {
   if (typeof productosConocidos[k] === 'string') {
@@ -1081,6 +1232,11 @@ let catActual       = 'Otros';
 let catNuevo        = 'Otros';
 let codigoPendiente = null;
 let quaggaRunning   = false;
+let searchQuery     = '';
+let searchActive    = false;
+let editarItemIdx   = null;
+let editarFijoVal   = false;
+let catOrdenTemp    = [];
 
 // ── Historial ─────────────────────────────────────────────────────────────────
 
@@ -1124,10 +1280,111 @@ function renderFrecuentes() {
 function agregarDesdeFrecuentes(key) {
   const h = historial[key];
   if (!h) return;
-  lista.push({ nombre: h.nombre, comprado: false, categoria: h.categoria, cantidad: 1 });
+  lista.push({ nombre: h.nombre, comprado: false, categoria: h.categoria, cantidad: 1, nota: '', precio: null, fijo: false });
   actualizarHistorial(h.nombre, h.categoria);
   render();
   mostrarToast('➕ ' + h.nombre + ' añadido');
+}
+
+// ── Buscar ────────────────────────────────────────────────────────────────────
+
+function toggleSearch() {
+  searchActive = !searchActive;
+  document.getElementById('searchBar').style.display = searchActive ? 'block' : 'none';
+  document.getElementById('btnSearchToggle').classList.toggle('active', searchActive);
+  if (searchActive) {
+    document.getElementById('searchInput').focus();
+  } else {
+    searchQuery = '';
+    document.getElementById('searchInput').value = '';
+    render();
+  }
+}
+
+// ── Editar item ───────────────────────────────────────────────────────────────
+
+function abrirEditarItem(index, event) {
+  event.stopPropagation();
+  editarItemIdx = index;
+  const p = lista[index];
+  editarFijoVal = p.fijo || false;
+  document.getElementById('editarTitulo').textContent = p.nombre;
+  document.getElementById('editarNota').value   = p.nota   || '';
+  document.getElementById('editarPrecio').value = p.precio != null ? p.precio : '';
+  actualizarToggleFijo();
+  document.getElementById('modalEditarItem').classList.add('active');
+  setTimeout(() => document.getElementById('editarNota').focus(), 320);
+}
+function actualizarToggleFijo() {
+  document.getElementById('editarFijoToggle').className = 'toggle-switch' + (editarFijoVal ? ' on' : '');
+}
+function toggleFijoEdit() {
+  editarFijoVal = !editarFijoVal;
+  actualizarToggleFijo();
+}
+function confirmarEditarItem() {
+  if (editarItemIdx === null) return;
+  const nota   = document.getElementById('editarNota').value.trim();
+  const precio = document.getElementById('editarPrecio').value;
+  lista[editarItemIdx].nota   = nota;
+  lista[editarItemIdx].precio = precio !== '' ? parseFloat(precio) : null;
+  lista[editarItemIdx].fijo   = editarFijoVal;
+  cerrarEditarItem();
+  render();
+}
+function cerrarEditarItem() {
+  document.getElementById('modalEditarItem').classList.remove('active');
+  editarItemIdx = null;
+}
+
+// ── Total estimado ────────────────────────────────────────────────────────────
+
+function calcularTotal() {
+  const items = lista.filter(p => p.precio != null && p.precio > 0);
+  if (items.length === 0) return null;
+  return items.reduce((sum, p) => sum + (p.precio * (p.cantidad || 1)), 0);
+}
+
+// ── Reordenar categorías ──────────────────────────────────────────────────────
+
+function abrirReordenar() {
+  catOrdenTemp = [...catOrden];
+  renderReordenarLista();
+  document.getElementById('modalReordenar').classList.add('active');
+}
+function cerrarReordenar() {
+  document.getElementById('modalReordenar').classList.remove('active');
+}
+function renderReordenarLista() {
+  const cont = document.getElementById('reordenarLista');
+  cont.innerHTML = '';
+  catOrdenTemp.forEach((nombre, idx) => {
+    const cat = CAT_MAP[nombre];
+    if (!cat) return;
+    const row = document.createElement('div');
+    row.className = 'cat-reorder-item';
+    row.innerHTML = `
+      <span class="cat-reorder-emoji">${cat.emoji}</span>
+      <span class="cat-reorder-nombre">${cat.nombre}</span>
+      <div class="cat-reorder-btns">
+        <button class="btn-reorder" onclick="moverCategoria(${idx},-1)" ${idx === 0 ? 'disabled' : ''}>↑</button>
+        <button class="btn-reorder" onclick="moverCategoria(${idx}, 1)" ${idx === catOrdenTemp.length-1 ? 'disabled' : ''}>↓</button>
+      </div>`;
+    cont.appendChild(row);
+  });
+}
+function moverCategoria(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= catOrdenTemp.length) return;
+  [catOrdenTemp[idx], catOrdenTemp[newIdx]] = [catOrdenTemp[newIdx], catOrdenTemp[idx]];
+  renderReordenarLista();
+}
+function confirmarReordenar() {
+  catOrden = [...catOrdenTemp];
+  localStorage.setItem('cat_orden_super', JSON.stringify(catOrden));
+  cerrarReordenar();
+  render();
+  mostrarToast('Orden guardado ✓');
 }
 
 // ── Cantidad ──────────────────────────────────────────────────────────────────
@@ -1188,7 +1445,9 @@ let _catObserver = null;
 
 function renderCatNav() {
   const bar = document.getElementById('catNavBar');
-  const catsConItems = CATEGORIAS.filter(cat => lista.some(p => p.categoria === cat.nombre));
+  if (searchQuery) { bar.style.display = 'none'; return; }
+  const catsOrdenadas = catOrden.map(n => CAT_MAP[n]).filter(Boolean);
+  const catsConItems  = catsOrdenadas.filter(cat => lista.some(p => p.categoria === cat.nombre));
   if (catsConItems.length <= 1) { bar.style.display = 'none'; return; }
   bar.style.display = '';
   bar.innerHTML = '';
@@ -1203,6 +1462,14 @@ function renderCatNav() {
     };
     bar.appendChild(btn);
   });
+  // Botón reordenar
+  const rBtn = document.createElement('button');
+  rBtn.className   = 'cat-nav-chip';
+  rBtn.textContent = '⇅';
+  rBtn.title       = 'Reordenar pasillos';
+  rBtn.style.minWidth = '36px';
+  rBtn.onclick     = abrirReordenar;
+  bar.appendChild(rBtn);
 }
 
 function initCatObserver() {
@@ -1254,6 +1521,16 @@ function render() {
   document.getElementById('progressText').textContent =
     total > 0 ? `${comprados} de ${total} productos` : '';
 
+  // Total estimado
+  const totalPrecio = calcularTotal();
+  const totalEl = document.getElementById('totalEstimado');
+  if (totalPrecio !== null) {
+    totalEl.textContent    = `Total estimado: $${totalPrecio.toFixed(2)}`;
+    totalEl.style.display  = '';
+  } else {
+    totalEl.style.display  = 'none';
+  }
+
   // Toolbar
   const btn    = document.getElementById('btnFinalizar');
   const btnWA  = document.getElementById('btnWhatsapp');
@@ -1284,17 +1561,23 @@ function render() {
     return;
   }
 
-  // Grouped by category
+  // Filtered items
+  const q = searchQuery.toLowerCase();
+  const matchItem = p => !q || p.nombre.toLowerCase().includes(q) || (p.nota && p.nota.toLowerCase().includes(q));
+
+  // Grouped by category (using catOrden)
   cont.innerHTML = '';
-  CATEGORIAS.forEach(cat => {
+  let anyVisible = false;
+  catOrden.map(n => CAT_MAP[n]).filter(Boolean).forEach(cat => {
     const items = lista
       .map((p, i) => ({ ...p, idx: i }))
-      .filter(p => p.categoria === cat.nombre);
+      .filter(p => p.categoria === cat.nombre && matchItem(p));
     if (items.length === 0) return;
+    anyVisible = true;
 
     const section   = document.createElement('div');
-    section.className  = 'cat-section';
-    section.id         = 'sec-' + cat.nombre;
+    section.className   = 'cat-section';
+    section.id          = 'sec-' + cat.nombre;
     section.dataset.cat = cat.nombre;
     const doneCount = items.filter(p => p.comprado).length;
     const allDone   = doneCount === items.length;
@@ -1321,17 +1604,30 @@ function render() {
            </div>`
         : `<span class="qty-done">${qty > 1 ? '×' + qty : ''}</span>`;
 
+      const optsBtn = !p.comprado
+        ? `<button class="btn-opts" onclick="abrirEditarItem(${p.idx},event)" aria-label="Editar">⋯</button>`
+        : '';
+
       div.innerHTML = `
         <span class="item-emoji">${cat.emoji}</span>
-        <span class="item-nombre">${escapeHtml(p.nombre)}</span>
+        <div class="item-info">
+          <span class="item-nombre">${escapeHtml(p.nombre)}</span>
+          ${p.nota ? `<span class="item-nota">${escapeHtml(p.nota)}</span>` : ''}
+        </div>
         ${stepperHtml}
+        ${p.fijo ? '<span class="item-fijo-pin">📌</span>' : ''}
         <span class="item-check">${p.comprado ? '✓' : ''}</span>
+        ${optsBtn}
         <button class="btn-delete" onclick="borrarItem(${p.idx},event)" aria-label="Borrar">✕</button>`;
       section.appendChild(div);
     });
 
     cont.appendChild(section);
   });
+
+  if (!anyVisible && q) {
+    cont.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>Sin resultados para <strong>"${escapeHtml(searchQuery)}"</strong></p></div>`;
+  }
 
   renderCatNav();
   requestAnimationFrame(initCatObserver);
@@ -1347,6 +1643,9 @@ function toggleComprado(index) {
 
 function borrarItem(index, event) {
   event.stopPropagation();
+  if (lista[index].fijo) {
+    if (!confirm(`"${lista[index].nombre}" está marcado como fijo. ¿Borrar igual?`)) return;
+  }
   lista.splice(index, 1);
   render();
 }
@@ -1355,7 +1654,7 @@ function agregarManual() {
   const input  = document.getElementById('manualInput');
   const nombre = input.value.trim();
   if (!nombre) { input.focus(); return; }
-  lista.push({ nombre, comprado: false, categoria: catActual, cantidad: 1 });
+  lista.push({ nombre, comprado: false, categoria: catActual, cantidad: 1, nota: '', precio: null, fijo: false });
   actualizarHistorial(nombre, catActual);
   input.value = '';
   render();
@@ -1493,7 +1792,7 @@ function confirmarNuevoProducto() {
   if (!nombre) { document.getElementById('nombreNuevo').focus(); return; }
   productosConocidos[codigoPendiente] = { nombre, categoria: catNuevo };
   localStorage.setItem('diccionario_super', JSON.stringify(productosConocidos));
-  lista.push({ nombre, comprado: false, categoria: catNuevo, cantidad: 1 });
+  lista.push({ nombre, comprado: false, categoria: catNuevo, cantidad: 1, nota: '', precio: null, fijo: false });
   actualizarHistorial(nombre, catNuevo);
   cancelarNuevoProducto();
   render();
@@ -1576,6 +1875,16 @@ document.getElementById('modalNuevoProducto').addEventListener('click', function
 document.getElementById('modalResumen').addEventListener('click', function(e) {
   if (e.target === this) cerrarResumen();
 });
+document.getElementById('modalEditarItem').addEventListener('click', function(e) {
+  if (e.target === this) cerrarEditarItem();
+});
+document.getElementById('modalReordenar').addEventListener('click', function(e) {
+  if (e.target === this) cerrarReordenar();
+});
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  render();
+});
 document.getElementById('authPass').addEventListener('keydown', e => {
   if (e.key === 'Enter') iniciarSesion();
 });
@@ -1584,6 +1893,9 @@ document.addEventListener('keydown', e => {
   if (document.getElementById('cameraOverlay').classList.contains('active'))       cerrarCamara();
   if (document.getElementById('modalNuevoProducto').classList.contains('active'))  cancelarNuevoProducto();
   if (document.getElementById('modalResumen').classList.contains('active'))        cerrarResumen();
+  if (document.getElementById('modalEditarItem').classList.contains('active'))     cerrarEditarItem();
+  if (document.getElementById('modalReordenar').classList.contains('active'))      cerrarReordenar();
+  if (searchActive) toggleSearch();
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────────
