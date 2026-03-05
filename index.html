@@ -867,16 +867,17 @@ function mostrarLogin() {
   document.getElementById('authPass').value  = '';
   document.getElementById('authError').style.display = 'none';
 }
-function mostrarAuthError(msg) {
+function mostrarAuthError(msg, tipo = 'error') {
   const el = document.getElementById('authError');
-  el.textContent = msg;
-  el.style.display = '';
+  el.textContent  = msg;
+  el.style.color   = tipo === 'ok' ? 'var(--success)' : 'var(--danger)';
+  el.style.display = 'block';
 }
 
 async function iniciarSesion() {
   const email = document.getElementById('authEmail').value.trim();
   const pass  = document.getElementById('authPass').value;
-  if (!email || !pass) return;
+  if (!email || !pass) { mostrarAuthError('Completá email y contraseña'); return; }
   const btn = document.getElementById('btnLogin');
   btn.disabled    = true;
   btn.textContent = 'Entrando...';
@@ -889,16 +890,18 @@ async function iniciarSesion() {
 async function registrarse() {
   const email = document.getElementById('authEmail').value.trim();
   const pass  = document.getElementById('authPass').value;
-  if (!email || !pass) return;
+  if (!email || !pass) { mostrarAuthError('Completá email y contraseña'); return; }
+  if (pass.length < 6)  { mostrarAuthError('La contraseña debe tener al menos 6 caracteres'); return; }
   const btn = document.getElementById('btnRegistrar');
   btn.disabled    = true;
   btn.textContent = 'Registrando...';
-  const { error } = await _supabase.auth.signUp({ email, password: pass });
+  const { data, error } = await _supabase.auth.signUp({ email, password: pass });
   if (error) {
     mostrarAuthError('No se pudo registrar: ' + error.message);
+  } else if (data.session) {
+    // email confirmation desactivado → entra directo (onAuthStateChange lo maneja)
   } else {
-    mostrarAuthError('✅ Revisá tu email para confirmar la cuenta');
-    document.getElementById('authError').style.color = 'var(--success)';
+    mostrarAuthError('✅ Revisá tu email para confirmar la cuenta', 'ok');
   }
   btn.disabled    = false;
   btn.textContent = 'Registrarme';
