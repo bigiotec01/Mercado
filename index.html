@@ -12,6 +12,7 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <title>Mi Súper App</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/quagga/dist/quagga.min.js"></script>
   <style>
     /* ── Reset & Variables ───────────────────────────── */
@@ -57,6 +58,11 @@
       font-weight: 700;
       letter-spacing: -0.3px;
     }
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
     .version-badge {
       font-size: 10px;
       font-weight: 600;
@@ -66,6 +72,21 @@
       border-radius: 99px;
       letter-spacing: 0.3px;
     }
+    .sync-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 99px;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.3s, opacity 0.3s;
+    }
+    .sync-badge.synced  { background: rgba(100,220,130,0.32); opacity: 1; }
+    .sync-badge.syncing { background: rgba(255,255,255,0.18); opacity: 0.7; animation: syncPulse 1s infinite; }
+    .sync-badge.error   { background: rgba(255,100,100,0.32); opacity: 1; }
+    @keyframes syncPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
     .header-sub {
       font-size: 13px;
       opacity: 0.85;
@@ -633,7 +654,10 @@
 <header>
   <div class="header-top">
     <h1>🛒 Mi Lista</h1>
-    <span class="version-badge" id="versionBadge"></span>
+    <div class="header-badges">
+      <span class="version-badge" id="versionBadge"></span>
+      <span class="sync-badge" id="syncBadge"></span>
+    </div>
   </div>
   <p class="header-sub" id="headerSub">Tu lista está vacía</p>
   <div class="progress-wrap">
@@ -718,9 +742,90 @@
 </div>
 
 <script>
+// ── Supabase Config ───────────────────────────────────────────────────────────
+// Reemplaza estos valores con los de tu proyecto en supabase.com → Settings → API
+
+const SUPABASE_URL = 'https://tjxtswhygoydvhntlqth.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqeHRzd2h5Z295ZHZobnRscXRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NzM3ODMsImV4cCI6MjA4ODI0OTc4M30.DSCEEnXf4SSvYuYekc1bXX94Zucl-cXwTPEvKgnIR8Q';
+
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function getUserId() {
+  let id = localStorage.getItem('mercado_user_id');
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem('mercado_user_id', id); }
+  return id;
+}
+const USER_ID = getUserId();
+
+function setSyncStatus(status) {
+  const el = document.getElementById('syncBadge');
+  if (!el) return;
+  const s = {
+    syncing: { text: '↻ Sync', cls: 'syncing' },
+    synced:  { text: '● Sync', cls: 'synced'  },
+    error:   { text: '✕ Sin sync', cls: 'error' },
+  }[status] || { text: '● Sync', cls: 'synced' };
+  el.textContent = s.text;
+  el.className   = 'sync-badge ' + s.cls;
+}
+
+let _syncTimer = null;
+function scheduleSync() {
+  clearTimeout(_syncTimer);
+  setSyncStatus('syncing');
+  _syncTimer = setTimeout(saveToSupabase, 1500);
+}
+
+async function saveToSupabase() {
+  if (SUPABASE_URL.includes('TU_PROYECTO')) return;
+  try {
+    await _supabase.from('user_data').upsert({
+      user_id: USER_ID,
+      lista,
+      productos_conocidos: productosConocidos,
+      historial,
+    }, { onConflict: 'user_id' });
+    setSyncStatus('synced');
+  } catch (e) {
+    console.warn('Supabase sync error:', e);
+    setSyncStatus('error');
+  }
+}
+
+async function loadFromSupabase() {
+  if (SUPABASE_URL.includes('TU_PROYECTO')) return;
+  setSyncStatus('syncing');
+  try {
+    const { data } = await _supabase
+      .from('user_data')
+      .select('*')
+      .eq('user_id', USER_ID)
+      .single();
+    if (data) {
+      lista              = data.lista              || lista;
+      productosConocidos = data.productos_conocidos || productosConocidos;
+      historial          = data.historial           || historial;
+      lista = lista.map(p => ({
+        nombre:    p.nombre,
+        comprado:  p.comprado  || false,
+        categoria: p.categoria || 'Otros',
+        cantidad:  p.cantidad  || 1,
+      }));
+      localStorage.setItem('lista_super',       JSON.stringify(lista));
+      localStorage.setItem('diccionario_super', JSON.stringify(productosConocidos));
+      localStorage.setItem('historial_super',   JSON.stringify(historial));
+      render();
+    }
+    setSyncStatus('synced');
+  } catch (e) {
+    console.warn('Supabase load error:', e);
+    setSyncStatus('error');
+  }
+}
+
 // ── Version ───────────────────────────────────────────────────────────────────
 
-const APP_VERSION = 'v2.0.0';
+const APP_VERSION = 'v2.1.0';
 document.getElementById('versionBadge').textContent = APP_VERSION;
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -912,6 +1017,7 @@ function render() {
 
   // Save
   localStorage.setItem('lista_super', JSON.stringify(lista));
+  scheduleSync();
 
   // Frecuentes
   renderFrecuentes();
@@ -1147,10 +1253,9 @@ function cancelarNuevoProducto() {
 function abrirResumenFinal() {
   const faltantes = lista.filter(p => !p.comprado);
   if (faltantes.length === 0) {
-    if (confirm('¡Compraste todo! ¿Vaciar la lista?')) {
-      lista = [];
-      render();
-    }
+    lista = lista.map(p => ({ ...p, comprado: false }));
+    render();
+    mostrarToast('¡Todo listo! Lista reiniciada para la próxima 🎉');
     return;
   }
 
@@ -1188,7 +1293,7 @@ function cerrarResumen() {
 }
 
 function confirmarYLimpiar() {
-  lista = lista.filter(p => !p.comprado);
+  lista = lista.map(p => ({ ...p, comprado: false }));
   cerrarResumen();
   render();
   mostrarToast('Lista guardada para la próxima 🎉');
@@ -1225,6 +1330,7 @@ document.addEventListener('keydown', e => {
 
 initCatChips();
 render();
+loadFromSupabase(); // carga desde Supabase y re-renderiza si hay datos más nuevos
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
